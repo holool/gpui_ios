@@ -1,0 +1,12 @@
+[package]
+name = "gpui-ios-native-example"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[lib]
+crate-type = ["staticlib"]
+
+[target.'cfg(target_os = "ios")'.dependencies]
+gpui_ios = { path = "../.." }
+gpui = { git = "https://github.com/holool/gpui-fast", rev = "55c46ade80f217897b2c8c0a7d2f32ce5cd41dfe", default-features = false }
