@@ -183,9 +183,14 @@ private final class GPUIView: UIView, UITextInput {
         touchIDs.removeAll()
     }
     override func pressesBegan(_ presses: Set<UIPress>, with event: UIPressesEvent?) {
-        var handled = false
+        var unhandled: Set<UIPress> = []
         for press in presses {
-            guard let key = press.key else { continue }
+            guard let key = press.key else { unhandled.insert(press); continue }
+            // Candidate navigation and confirmation belong to UIKit while composing.
+            if markedTextRange != nil && key.modifierFlags.intersection([.command, .control]).isEmpty {
+                unhandled.insert(press)
+                continue
+            }
             let name: String?
             switch key.keyCode {
             case .keyboardLeftArrow: name = "left"
@@ -204,10 +209,9 @@ private final class GPUIView: UIView, UITextInput {
                 if key.modifierFlags.contains(.alternate) { flags |= 4 }
                 if key.modifierFlags.contains(.command) { flags |= 8 }
                 name.withCString { gpui_ios_key(id, $0, flags) }
-                handled = true
-            }
+            } else { unhandled.insert(press) }
         }
-        if !handled { super.pressesBegan(presses, with: event) }
+        if !unhandled.isEmpty { super.pressesBegan(unhandled, with: event) }
     }
 
     private func readSnapshot() -> InputSnapshot {
