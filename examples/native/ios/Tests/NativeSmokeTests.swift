@@ -25,5 +25,8 @@ final class NativeSmokeTests: XCTestCase {
         for key in ["a", "b", "c"] { app.keyboards.keys[key].tap() }
         let committed = expectation(for: NSPredicate(format: "value CONTAINS %@", "abc"), evaluatedWith: input)
         wait(for: [committed], timeout: 5)
+        app.keyboards.keys["delete"].tap()
+        let deleted = expectation(for: NSPredicate(format: "value ENDSWITH %@", "ab"), evaluatedWith: input)
+        wait(for: [deleted], timeout: 5)
     }
 }
