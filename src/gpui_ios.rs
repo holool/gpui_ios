@@ -9,4 +9,4 @@ mod backend;
 #[cfg(target_os = "ios")]
 mod bridge;
 #[cfg(target_os = "ios")]
-pub use backend::{IosPlatform, application, data_directory, run, shutdown};
+pub use backend::{IosPlatform, application, data_directory, run, run_with, shutdown};

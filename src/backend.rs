@@ -37,7 +37,12 @@ pub fn application() -> Application {
 
 /// Launch and retain an embedded application until [`shutdown`].
 pub fn run(launch: impl FnOnce(&mut App) + 'static) {
-    let app = application().run_embedded(launch);
+    run_with(application(), launch);
+}
+
+/// Retain a configured embedded application, including its asset source and HTTP client.
+pub fn run_with(application: Application, launch: impl FnOnce(&mut App) + 'static) {
+    let app = application.run_embedded(launch);
     APPLICATION.with(|slot| *slot.borrow_mut() = Some(app));
 }
 

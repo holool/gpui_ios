@@ -48,7 +48,7 @@ pub extern "C" fn my_app_launch() {
 }
 ```
 
-`run` retains `ApplicationHandle` while UIKit drives events. `application()` is available for asset/HTTP configuration; use `run_embedded` and retain its handle yourself in that case. `shutdown()` releases the app when the native host is actually terminating. Returning from ordinary `Application::run` does not retain an embedded app.
+`run` retains `ApplicationHandle` while UIKit drives events. For custom asset or HTTP configuration, use `run_with(application().with_assets(MyAssets), launch)`. Both helpers retain the configured app until `shutdown()` releases it when the native host is actually terminating. Returning from ordinary `Application::run` does not retain an embedded app.
 
 `data_directory()` returns the sandbox's Application Support directory without modifying process environment variables. Clipboard and Keychain use the native Apple services. Unsupported document pickers and auxiliary executables return explicit errors.
 
