@@ -7,7 +7,10 @@ final class NativeSmokeTests: XCTestCase {
         app.launch()
 
         let counter = app.buttons["Touch counter"]
-        XCTAssertTrue(counter.waitForExistence(timeout: 15))
+        guard counter.waitForExistence(timeout: 15) else {
+            XCTFail(app.debugDescription)
+            return
+        }
         XCTAssertEqual(counter.value as? String, "0")
         counter.tap()
         let incremented = expectation(for: NSPredicate(format: "value == %@", "1"), evaluatedWith: counter)
@@ -17,7 +20,9 @@ final class NativeSmokeTests: XCTestCase {
         XCTAssertTrue(input.exists)
         input.tap()
         XCTAssertTrue(app.keyboards.firstMatch.waitForExistence(timeout: 10))
-        app.typeText("abc")
+        // Stage 1 exposes a semantic input, while UIKit's IME client stays hidden.
+        // Tap real software keys instead of requiring an editable AX text field.
+        for key in ["a", "b", "c"] { app.keyboards.keys[key].tap() }
         let committed = expectation(for: NSPredicate(format: "value CONTAINS %@", "abc"), evaluatedWith: input)
         wait(for: [committed], timeout: 5)
     }

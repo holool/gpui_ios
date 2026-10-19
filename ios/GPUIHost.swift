@@ -53,7 +53,12 @@ private final class AccessibleElement: UIAccessibilityElement {
     let nodeID: UInt64
     var canClick = false
     var canFocus = false
-    init(view: GPUIView, node: UInt64) { windowID = view.id; nodeID = node; super.init(accessibilityContainer: view) }
+    init(view: GPUIView, node: UInt64) {
+        windowID = view.id
+        nodeID = node
+        super.init(accessibilityContainer: view.semanticContainer ?? view)
+        isAccessibilityElement = true
+    }
     override func accessibilityActivate() -> Bool {
         guard canClick else { return false }
         gpui_ios_accessibility_action(windowID, nodeID, false)
@@ -66,6 +71,7 @@ private final class AccessibleElement: UIAccessibilityElement {
 
 private final class GPUIView: UIView, UITextInput {
     let id: UInt64
+    weak var semanticContainer: UIView?
     private var displayLink: CADisplayLink?
     var isPaused = false { didSet { displayLink?.isPaused = isPaused } }
     private var touchIDs: [ObjectIdentifier: (UInt64, CGPoint)] = [:]
@@ -93,6 +99,9 @@ private final class GPUIView: UIView, UITextInput {
     var isSecureTextEntry = false
 
     override class var layerClass: AnyClass { CAMetalLayer.self }
+    // UIKit's UITextInput accessibility specialization must not replace our semantic container.
+    override var isAccessibilityElement: Bool { get { false } set {} }
+    override var accessibilityTraits: UIAccessibilityTraits { get { [] } set {} }
     override var canBecomeFirstResponder: Bool { true }
     init(id: UInt64) {
         self.id = id
@@ -419,7 +428,9 @@ private final class GPUIView: UIView, UITextInput {
         }
         let changed = Set(next.keys) != Set(semanticElements.keys)
         semanticElements = next
-        accessibilityElements = ordered
+        let container = semanticContainer ?? self
+        container.accessibilityElements = ordered
+        if #available(iOS 17.0, *) { container.automationElements = ordered }
         if changed && UIAccessibility.isVoiceOverRunning { UIAccessibility.post(notification: .layoutChanged, argument: nil) }
     }
 }
@@ -429,8 +440,17 @@ func hostCreate(_ id: UInt64) -> UnsafeMutableRawPointer? {
     precondition(Thread.isMainThread)
     let window = UIWindow(frame: UIScreen.main.bounds)
     let view = GPUIView(id: id)
+    // UITextInput is exposed by UIKit as a TextView regardless of custom children.
+    // A plain parent vends the GPUI tree and hides that IME implementation detail.
+    let container = UIView(frame: UIScreen.main.bounds)
+    container.isAccessibilityElement = false
+    view.semanticContainer = container
+    view.accessibilityElementsHidden = true
+    view.frame = container.bounds
+    view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+    container.addSubview(view)
     let controller = UIViewController()
-    controller.view = view
+    controller.view = container
     window.rootViewController = controller
     GPUIHost.windows[id] = GPUIWindow(window: window, view: view)
     return Unmanaged.passUnretained(view).toOpaque()
