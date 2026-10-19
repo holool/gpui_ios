@@ -1,0 +1,14 @@
+name: iOS
+on: [push, pull_request]
+jobs:
+  simulator:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@1.95.0
+        with:
+          targets: aarch64-apple-ios-sim
+      - run: brew install xcodegen
+      - run: xcrun --sdk iphonesimulator metal --version || xcodebuild -downloadComponent MetalToolchain
+      - run: cargo +1.95.0 test --locked -p gpui_ios --lib
+      - run: GPUI_RUST_TOOLCHAIN=1.95.0 bash scripts/build-example.sh

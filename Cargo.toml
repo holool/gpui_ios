@@ -1,0 +1,36 @@
+[package]
+name = "gpui_ios"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.95"
+license = "Apache-2.0"
+description = "Native UIKit and Metal platform backend for Holool GPUI Fast"
+repository = "https://github.com/holool/gpui_ios"
+
+[lib]
+path = "src/gpui_ios.rs"
+
+[features]
+default = []
+runtime_shaders = ["gpui_apple/runtime_shaders"]
+
+[dependencies]
+unicode-segmentation = "1.12"
+
+[target.'cfg(target_os = "ios")'.dependencies]
+gpui = { git = "https://github.com/holool/gpui-fast", rev = "892ef445f5d2851f542514b76dbce7c9b1ebeeee", default-features = false }
+gpui_apple = { git = "https://github.com/holool/gpui-fast", rev = "892ef445f5d2851f542514b76dbce7c9b1ebeeee", features = ["font-kit"] }
+anyhow = "1"
+futures = "0.3"
+parking_lot = "0.12"
+raw-window-handle = "0.6"
+objc2-quartz-core = { version = "=0.3.2", default-features = false, features = ["std", "CALayer", "CAMetalLayer"] }
+serde_json = "1"
+uuid = "1"
+log = "0.4"
+
+[workspace]
+members = ["examples/native"]
+
+[profile.dev]
+debug = 0

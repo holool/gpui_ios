@@ -1,0 +1,40 @@
+name: Native
+options:
+  bundleIdPrefix: dev.holool
+  deploymentTarget:
+    iOS: "16.0"
+targets:
+  Native:
+    type: application
+    platform: iOS
+    sources:
+      - Main.swift
+      - ../../../ios/GPUIHost.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: dev.holool.gpui-ios-example
+        SWIFT_OBJC_BRIDGING_HEADER: Bridge.h
+        SWIFT_VERSION: "5.0"
+        GENERATE_INFOPLIST_FILE: YES
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+        LIBRARY_SEARCH_PATHS: "$(GPUI_RUST_LIBRARY_DIR)"
+        OTHER_LDFLAGS: ["-all_load", "-lgpui_ios_native_example", "-lc++", "-framework", "Metal", "-framework", "QuartzCore", "-framework", "CoreText", "-framework", "CoreGraphics", "-framework", "Security", "-framework", "CoreVideo"]
+  NativeSmokeTests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources: [Tests]
+    dependencies:
+      - target: Native
+    settings:
+      base:
+        GENERATE_INFOPLIST_FILE: YES
+        PRODUCT_BUNDLE_IDENTIFIER: dev.holool.gpui-ios-example.smoke
+        SWIFT_VERSION: "5.0"
+schemes:
+  Native:
+    build:
+      targets:
+        Native: all
+    test:
+      targets: [NativeSmokeTests]
