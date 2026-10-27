@@ -128,6 +128,13 @@ impl PlatformKeyboardLayout for IosKeyboard {
 }
 
 impl Platform for IosPlatform {
+    fn platform_info(&self) -> PlatformInfo {
+        PlatformInfo {
+            os: OperatingSystem::Ios,
+            target: PlatformTarget::Native,
+        }
+    }
+
     fn background_executor(&self) -> BackgroundExecutor {
         self.background.clone()
     }

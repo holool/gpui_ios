@@ -127,6 +127,7 @@ pub extern "C" fn gpui_ios_insets(
                 bottom: px(keyboard),
                 ..Default::default()
             },
+            ..Default::default()
         };
         if *state.insets.borrow() == insets {
             return;

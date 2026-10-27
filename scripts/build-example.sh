@@ -16,7 +16,7 @@ fi
 export CARGO_PROFILE_DEV_DEBUG="${CARGO_PROFILE_DEV_DEBUG:-0}"
 export CARGO_INCREMENTAL="${CARGO_INCREMENTAL:-0}"
 export CARGO_BUILD_JOBS="${CARGO_BUILD_JOBS:-4}"
-cargo "+${GPUI_RUST_TOOLCHAIN:-1.95}" build "${args[@]}"
+cargo "+${GPUI_RUST_TOOLCHAIN:-1.99.0}" build "${args[@]}"
 xcodegen generate --spec examples/native/ios/project.yml
 rust_target="${CARGO_TARGET_DIR:-$task_root/target}"
 if [[ "$rust_target" != /* ]]; then rust_target="$task_root/$rust_target"; fi
