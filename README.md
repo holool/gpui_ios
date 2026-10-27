@@ -6,7 +6,7 @@ The reusable Swift host owns UIKit's run loop, `CADisplayLink`, lifecycle, keybo
 
 ## Build the native example
 
-Requires macOS, Xcode with the iOS SDK and Metal Toolchain, Rust 1.95, and XcodeGen.
+Requires macOS, Xcode with the iOS SDK and Metal Toolchain, Rust 1.99.0, and XcodeGen.
 
 ```sh
 brew install xcodegen
